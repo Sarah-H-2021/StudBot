@@ -1,5 +1,5 @@
 pymysql
-telebot 
+pytelegrambotapi
 prettytable
 textdistance
 pandas 
