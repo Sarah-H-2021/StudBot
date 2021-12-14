@@ -1,6 +1,7 @@
 pymysql
 telebot 
 prettytable
+textdistance
 pandas 
 numpy
 bs4
