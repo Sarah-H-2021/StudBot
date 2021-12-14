@@ -1,1 +1,7 @@
 pymysql
+telebot 
+prettytable
+pandas 
+numpy
+bs4
+requests 
