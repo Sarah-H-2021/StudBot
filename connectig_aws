@@ -1,14 +1,38 @@
 import json
+import pandas as pd 
+import io
+import datetime
 import boto3
-from studbotscrapper import parse_costs
-def lambda_handler(event, context):
+from parsing_funcs import *
+    
+def write_to_s3 (df,name):
+    print ("[INFO] Request "+name+" data...")
+    destination = name+"_" + str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')) + '.json'
+    json_buffer = io.StringIO()
+    df.to_json(json_buffer)
     s3 = boto3.resource('s3')
-    print ("[INFO] Request cost data...")
-    all_data = parse_costs()
-    BUCKET_NAME = "hourlystudbot"
-    Program = f"{all_data ['Programme']}"
-    OUTPUT_NAME = f"dataKeyTest{ Program }.json"
-    OUTPUT_BODY = json.dumps(all_data)
-    print (f"[INFO] Saving Data to S3 {BUCKET_NAME} Bucket...")
-    s3.Bucket(BUCKET_NAME).put_object(Key=OUTPUT_NAME, Body=OUTPUT_BODY)
-    print (f"[INFO] Job done at { Program }")
+    my_bucket = s3.Bucket('hourlystudbot')
+    my_bucket.put_object(Key=destination, Body=json_buffer.getvalue())
+    print (f"[INFO] "+name+" Job done ")
+
+    
+def lambda_handler(event, context):
+    # code to get df 
+    names=["fees","living","rankings","programmes","housing_faq"]
+    s3 = boto3.resource('s3')
+    fees  =  parse_costs(which='fees')
+    write_to_s3(fees,"fees")
+    rankings = parse_rankings()
+    write_to_s3(rankings,"rankings")
+    living = parse_costs(which='living')
+    write_to_s3(living,"living")
+    programmes = parse_programmes()
+    write_to_s3(programmes,"programmes")
+    housing_faq = parse_housing_faq()
+    write_to_s3(housing_faq,"housing_faqs")
+    
+
+   
+
+
+ 
